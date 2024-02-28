@@ -1,21 +1,21 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from collections import Counter
 import seaborn as sns
+from collections import Counter
 
+################################################################
+# All this is needed for the model to work
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-
-# Read the CSV file into a pandas DataFrame
+# Gets the CSV frile we are looking at
 df = pd.read_csv('C:\\Users\\DAN\\Documents\\ITCS 3162-Data Mining\\Projects\\Project 2\\emails.csv')
 
 
-
-
 #################################################################
-#Pie chart function
+#Pie chart function creates pie chart from the data
 
 def plot_prediction_distribution(dataframe):
     #Prediction column
@@ -39,32 +39,39 @@ plot_prediction_distribution(df)
 
 
 ######################################################################
-#Confusion Matrix
 
-#Filtering the amount of rows and columns 
-#df_subset = df.iloc[-50:, -50:]
 
-# Target variable is in the last column
-X = df.iloc[:, 1:-1]
-y = df.iloc[:, -1]
+# Target the column we are trying to figure out
+target_column = 'Prediction'
 
-# Training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# This selects the columns with numeric values making it easier to deal with
+numeric_features = df.select_dtypes(include=['number'])
 
-# Create and train logistic regression model
-model = LogisticRegression()
-model.fit(X_train, y_train)
+# Excludes the target column from features
+features = numeric_features.drop(columns=[target_column])
 
-# Make predictions on the test set
-y_pred = model.predict(X_test)
+# Initialize the Gaussian Naive Bayes model
+model = GaussianNB()
 
-# Evaluate the model
-conf_matrix = confusion_matrix(y_test, y_pred)
-classification_rep = classification_report(y_test, y_pred)
+# Training 'features' based off of 'target_column'
+model.fit(features, df[target_column])
 
-#Confusion Matrix creation
-sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", cbar=False)
+# Make predictions on the entire dataset from the trained model 'features'
+predictions = model.predict(features)
+
+# Evaluates the model
+accuracy = accuracy_score(df[target_column], predictions)
+conf_matrix = confusion_matrix(df[target_column], predictions)
+classification_rep = classification_report(df[target_column], predictions)
+
+
+# Displays the Confusion Matrix for visual
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
-plt.ylabel('True')
+plt.ylabel('Actual')
 plt.title('Confusion Matrix')
 plt.show()
+print(f'Accuracy: {accuracy:.2f}')
+print('\nClassification Report:')
+print(classification_rep)
