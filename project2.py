@@ -17,7 +17,7 @@ df = pd.read_csv('C:\\Users\\DAN\\Documents\\ITCS 3162-Data Mining\\Projects\\Pr
 #################################################################
 #Pie chart function creates pie chart from the data
 
-def plot_prediction_distribution(dataframe):
+def pie_chart(dataframe):
     #Prediction column
     prediction_column = 'Prediction'
 
@@ -35,7 +35,7 @@ def plot_prediction_distribution(dataframe):
     plt.show()
 
 # Call the function with your DataFrame
-plot_prediction_distribution(df)
+pie_chart(df)
 
 
 ######################################################################
